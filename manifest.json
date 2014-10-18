@@ -1,0 +1,23 @@
+{
+  "name": "Embed GitHub Issue Badges",
+  "version": "0.0.0",
+  "manifest_version": 2,
+  "description": "",
+  "permissions": [
+    "https://github.com/*",
+    "webRequest",
+    "webRequestBlocking"
+  ],
+  "background": {
+    "scripts": [
+      "app/js/background.js"
+    ],
+    "persistent": true
+  },
+  "content_scripts": [
+    {
+      "matches": [ "https://github.com/*" ],
+      "js": [ "app/js/inject.js" ]
+    }
+  ]
+}
