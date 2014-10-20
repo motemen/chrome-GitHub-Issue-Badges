@@ -5,7 +5,7 @@ var gulp    = require('gulp'),
 gulp.task('compile', function () {
   return gulp.src('app/ts/**/*.ts')
     .pipe($.plumber())
-    .pipe($.tsc())
+    .pipe($.tsc({ noImplicitAny: true }))
     .pipe(gulp.dest('.tmp/js'));
 });
 
