@@ -12,7 +12,7 @@ chrome.webRequest.onHeadersReceived.addListener(function (details) {
 
   return { responseHeaders: responseHeaders };
 }, {
-  urls: [ 'https://github.com/*' ],
+  urls: [ config.githubOrigin + '/*' ],
   types: <any>[ 'main_frame' ] // XXX tsd incorrect
 }, [
   'blocking', 'responseHeaders'

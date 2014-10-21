@@ -10,14 +10,14 @@
   ],
   "background": {
     "scripts": [
-      "app/js/background.js"
+      "js/background.js"
     ],
     "persistent": true
   },
   "content_scripts": [
     {
       "matches": [ "https://github.com/*" ],
-      "js": [ "app/js/inject.js" ]
+      "js": [ "js/inject.js" ]
     }
   ]
 }
