@@ -1,8 +1,11 @@
 var gulp    = require('gulp'),
     $       = require('gulp-load-plugins')()
-    webpack = require('webpack');
+    webpack = require('webpack'),
+    del     = require('del');
 
 var RE_GITHUB_ORIGIN = /^https:\/\/github\.com\b/;
+
+gulp.task('build', ['bundle', 'manifest']);
 
 gulp.task('manifest', ['compile'], function () {
   var extensionConfig = require('./.tmp/js/config.js');
@@ -13,7 +16,6 @@ gulp.task('manifest', ['compile'], function () {
 
   return gulp.src('src/manifest.json')
     .pipe($.jsonEditor(function (manifest) {
-
       manifest.permissions = manifest.permissions.map(rewriteGitHubOrigin);
 
       manifest.content_scripts.forEach(function (contentScript) {
@@ -22,24 +24,17 @@ gulp.task('manifest', ['compile'], function () {
 
       return manifest;
     }))
-    .pipe(gulp.dest('app/'));
+    .pipe(gulp.dest('build/'));
 });
 
-gulp.task('compile', function () {
-  return gulp.src('src/ts/**/*.ts')
-    .pipe($.plumber())
-    .pipe($.tsc({ noImplicitAny: true }))
-    .pipe(gulp.dest('.tmp/js'));
-});
-
-gulp.task('bundle', ['compile', 'manifest'], function (done) {
+gulp.task('bundle', ['compile'], function (done) {
   webpack({
     entry: {
       background: './.tmp/js/background.js',
       inject: './.tmp/js/inject.js'
     },
     output: {
-      path: './app/js',
+      path: './build/js',
       filename: '[name].js'
     },
     plugins: [
@@ -53,7 +48,17 @@ gulp.task('bundle', ['compile', 'manifest'], function (done) {
   }, done);
 });
 
-gulp.task('default', ['bundle']);
+gulp.task('compile', function () {
+  return gulp.src('src/ts/**/*.ts')
+    .pipe($.changed('.tmp/js', { extension: '.js' }))
+    .pipe($.plumber())
+    .pipe($.tsc({ noImplicitAny: true }))
+    .pipe(gulp.dest('.tmp/js'));
+});
+
+gulp.task('clean', del.bind(null, ['build/', '.tmp/']));
+
+gulp.task('default', ['build']);
 
 gulp.task('watch', function () {
   gulp.watch(['src/ts/**/*.ts'], ['bundle']);
