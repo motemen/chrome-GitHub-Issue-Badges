@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "description": "",
   "scripts": {
-    "postinstall": "$(npm bin)/tsd update"
+    "postinstall": "$(npm bin)/tsd update",
+    "build": "$(npm bin)/gulp build"
   },
   "author": "motemen <motemen@gmail.com>",
   "devDependencies": {
