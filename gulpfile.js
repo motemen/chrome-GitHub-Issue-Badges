@@ -52,7 +52,7 @@ gulp.task('compile', function () {
   return gulp.src('src/ts/**/*.ts')
     .pipe($.changed('.tmp/js', { extension: '.js' }))
     .pipe($.plumber())
-    .pipe($.tsc({ noImplicitAny: true }))
+    .pipe($.tsc({ noImplicitAny: true, target: 'ES6' }))
     .pipe(gulp.dest('.tmp/js'));
 });
 

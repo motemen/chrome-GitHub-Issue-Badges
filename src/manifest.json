@@ -16,7 +16,7 @@
   },
   "content_scripts": [
     {
-      "matches": [ "https://github.com/*" ],
+      "matches": [ "" ],
       "js": [ "js/inject.js" ]
     }
   ]
