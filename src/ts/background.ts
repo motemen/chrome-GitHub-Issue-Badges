@@ -22,6 +22,7 @@ chrome.webRequest.onHeadersReceived.addListener(function (details: any) {
 chrome.tabs.onUpdated.addListener(function(tagId: any, changeInfo: any, tab: any) {
     if (
         changeInfo.status === 'complete' &&
+        tab.url &&
         ~validOrigins().indexOf(new URL(tab.url).origin)
        ) {
         chrome.tabs.executeScript(tab.id, { file: "js/inject.js" })
