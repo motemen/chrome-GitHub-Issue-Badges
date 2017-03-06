@@ -5,7 +5,7 @@ var gulp    = require('gulp'),
 
 var RE_GITHUB_ORIGIN = /^https:\/\/github\.com\b/;
 
-gulp.task('build', ['bundle', 'manifest']);
+gulp.task('build', ['bundle', 'manifest', 'html']);
 
 gulp.task('manifest', ['compile'], function () {
   var extensionConfig = require('./.tmp/js/config.js');
@@ -27,11 +27,17 @@ gulp.task('manifest', ['compile'], function () {
     .pipe(gulp.dest('build/'));
 });
 
+gulp.task('html', function() {
+  return gulp.src('src/html/*.html')
+    .pipe(gulp.dest('build/html/'))
+})
+
 gulp.task('bundle', ['compile'], function (done) {
   webpack({
     entry: {
       background: './.tmp/js/background.js',
-      inject: './.tmp/js/inject.js'
+      inject: './.tmp/js/inject.js',
+      options: './.tmp/js/options.js'
     },
     output: {
       path: './build/js',

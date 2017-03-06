@@ -14,5 +14,6 @@
     ],
     "persistent": true
   },
+  "options_page": "html/option_page.html",
   "content_scripts": []
 }

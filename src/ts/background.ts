@@ -44,23 +44,36 @@ chrome.runtime.onMessage.addListener(function(req: string[], sender:any, sendRes
     return true; // indicate to send a response asynchronously.
 })
 
-const origins: { [host: string]: { apiRoot: string; token?: string; } } = {
-    'https://ghe.admin.h': {
-        apiRoot: '',
-        token  : ''
-    },
-    'https://github.com': {
-        apiRoot: 'https://api.github.com'
-    },
+function origins():{ [host: string]: { apiRoot: string; token?: string; } } {
+    const mapping: { [host: string]: { apiRoot: string; token?: string; } } = {
+        'https://github.com': {
+            apiRoot: 'https://api.github.com'
+        }
+    };
+    let list: any[] = [];
+    if (localStorage.getItem('origins')) {
+        try {
+            list = JSON.parse(localStorage.getItem('origins'));
+        } catch(e) {
+            list = [];
+        }
+    }
+    list.forEach((item: any) => {
+        mapping[item.origin] = {
+            apiRoot: item.apiRoot,
+            token  : item.token
+        }
+    });
+    return mapping;
 }
 
 function validOrigins() {
-    return ['https://github.com'].concat(['https://ghe.admin.h']);
+    return Object.keys(origins());
 }
 
 function _fetchIssue(origin: string, owner: string, repo: string, issueNum: string) {
-    const apiRoot = origins[origin].apiRoot;
-    const token   = origins[origin].token;
+    const apiRoot = origins()[origin].apiRoot;
+    const token   = origins()[origin].token;
     return new Promise((ok: any, ng: any) => {
         const xhr = new XMLHttpRequest();
         xhr.open("GET", `${apiRoot}/repos/${owner}/${repo}/issues/${issueNum}`);
