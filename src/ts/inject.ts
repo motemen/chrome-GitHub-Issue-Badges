@@ -6,6 +6,7 @@ function pickupUrls() {
     const links = Array.prototype.slice.call(document.body.querySelectorAll('a.issue-link'))
         .filter((link: HTMLAnchorElement) => !link.querySelector('svg.embed-badge'));
 
+    // TODO: do nothing when links.length is zero.
     return new Promise((ok, ng) => {
         chrome.runtime.sendMessage(
             links.map((link: HTMLAnchorElement) => link.href),
@@ -23,7 +24,7 @@ function update() {
             const issue = new Issue(
                 issueData.repository_url,
                 '#' + issueData.number,
-                issueData.state,
+                (issueData.merged ? 'merged' : issueData.state),
                 user
             )
             const badgeView = new BadgeView(issue)

@@ -33,10 +33,10 @@ chrome.runtime.onMessage.addListener(function(req: string[], sender:any, sendRes
     const origin = new URL(sender.url).origin;
     // TODO req を uniq する
     Promise.all(req.map(url => {
-        const [ _, owner, repo, issueNum ] =
-            /^https?:\/\/[^\/]+\/([^\/]+)\/([^\/]+)\/(?:issues|pull)\/(\d+)\b/.exec(url);
+        const [ _, owner, repo, issueOrPr, issueNum ] =
+            /^https?:\/\/[^\/]+\/([^\/]+)\/([^\/]+)\/(issues|pull)\/(\d+)\b/.exec(url);
 
-        return _fetchIssue(origin, owner, repo, issueNum)
+        return _fetchIssue(origin, owner, repo, (issueOrPr === 'issues' ? 'issues' : 'pulls'), issueNum)
     })).then(issues => {
         sendResponse(issues.filter(i => i !== undefined))
     }).catch(e => {
@@ -72,12 +72,12 @@ function validOrigins() {
     return Object.keys(origins());
 }
 
-function _fetchIssue(origin: string, owner: string, repo: string, issueNum: string) {
+function _fetchIssue(origin: string, owner: string, repo: string, issueOrPr: string, issueNum: string) {
     const apiRoot = origins()[origin].apiRoot;
     const token   = origins()[origin].token;
     return new Promise((ok: any, ng: any) => {
         const xhr = new XMLHttpRequest();
-        xhr.open("GET", `${apiRoot}/repos/${owner}/${repo}/issues/${issueNum}`);
+        xhr.open("GET", `${apiRoot}/repos/${owner}/${repo}/${issueOrPr}/${issueNum}`);
         if (token) {
             xhr.setRequestHeader("Authorization", `token ${token}`)
         }
