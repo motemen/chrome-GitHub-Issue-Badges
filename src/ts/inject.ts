@@ -1,51 +1,41 @@
-import config = require('./config');
-declare var Promise: any;
-const apiRoot = '';
-const token = '';
+declare var chrome: any;
 
-function _fetchIssue(owner: string, repo: string, issueNum: string) {
-    return new Promise((ok: any, ng: any) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open("GET", `${apiRoot}/repos/${owner}/${repo}/issues/${issueNum}`);
-        xhr.setRequestHeader("Authorization", `token ${token}`)
-        xhr.onload  = function(e) { ok(JSON.parse(xhr.responseText)) }
-        xhr.onerror = function(e) { ng(e) }
-        xhr.send();
-    })
-}
-
-function update () {
+function pickupUrls() {
     const links = Array.prototype.slice.call(document.body.querySelectorAll('a.issue-link'))
-    links.forEach(function (link: HTMLAnchorElement) {
-        if (link.querySelector('svg.embed-badge')) { return; }
+        .filter((link: HTMLAnchorElement) => !link.querySelector('svg.embed-badge'));
 
-        const [ url, owner, repo, issueNum ] =
-            /^https?:\/\/[^\/]+\/([^\/]+)\/([^\/]+)\/(?:issues|pull)\/(\d+)\b/.exec(link.href);
-
-        return _fetchIssue(owner, repo, issueNum).then((issueData: any) => {
-            const user = issueData.assignee || issueData.user
-            const issue = new Issue(
-                issueData.repository_url,
-                '#' + issueData.number,
-                issueData.state,
-                user,
-                issueData.labels
-            )
-            const badgeView = new BadgeView(issue)
-            
-            if (issueData.state === 'closed') {
-                link.style.textDecoration = 'line-through'
-                link.style.color = 'red'
-            }
-            link.innerHTML = badgeView.render() + ' ' + issueData.title;
-        })
+    return new Promise((ok, ng) => {
+        chrome.runtime.sendMessage(
+            links.map((link: HTMLAnchorElement) => link.href),
+            function(issues: any[]) { ok({ links, issues }) }
+        )
     })
 }
 
-update();
+pickupUrls().then((arg: any) => {
+    const links: HTMLAnchorElement[] = arg.links;
+    const issues: any[] = arg.issues;
+    const svgMap = issues.reduce((svgMap, issueData) => {
+        const user = issueData.assignee || issueData.user
+        const issue = new Issue(
+            issueData.repository_url,
+            '#' + issueData.number,
+            issueData.state,
+            user
+        )
+        const badgeView = new BadgeView(issue)
+        svgMap[issueData.html_url] = badgeView.render() + ' ' + issueData.title;
+        return svgMap;
+    }, <any>{})
+
+    links.forEach(link => {
+        const svg = svgMap[link.href];
+        link.innerHTML = svg;
+    })
+});
 
 var observer = new MutationObserver(function (mutations) {
-    update();
+
 });
 // observer.observe(document.body, { childList: true, subtree: true });
 
@@ -56,16 +46,7 @@ class Issue {
         public repo: string,
         public number: string,
         public state: string,
-        public assignee: { avatar_url: string },
-        public labels?: Label[]
-    ) {}
-}
-
-class Label {
-    constructor(
-        public color: string,
-        public name: string,
-        public url: string
+        public assignee: { avatar_url: string }
     ) {}
 }
 
