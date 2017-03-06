@@ -12,32 +12,36 @@ function pickupUrls() {
     })
 }
 
-pickupUrls().then((arg: any) => {
-    const links: HTMLAnchorElement[] = arg.links;
-    const issues: any[] = arg.issues;
-    const svgMap = issues.reduce((svgMap, issueData) => {
-        const user = issueData.assignee || issueData.user
-        const issue = new Issue(
-            issueData.repository_url,
-            '#' + issueData.number,
-            issueData.state,
-            user
-        )
-        const badgeView = new BadgeView(issue)
-        svgMap[issueData.html_url] = badgeView.render() + ' ' + issueData.title;
-        return svgMap;
-    }, <any>{})
+function update() {
+    pickupUrls().then((arg: any) => {
+        const links: HTMLAnchorElement[] = arg.links;
+        const issues: any[] = arg.issues;
+        const svgMap = issues.reduce((svgMap, issueData) => {
+            const user = issueData.assignee || issueData.user
+            const issue = new Issue(
+                issueData.repository_url,
+                '#' + issueData.number,
+                issueData.state,
+                user
+            )
+            const badgeView = new BadgeView(issue)
+            svgMap[issueData.html_url] = badgeView.render() + ' ' + issueData.title;
+            return svgMap;
+        }, <any>{})
 
-    links.forEach(link => {
-        const svg = svgMap[link.href];
-        link.innerHTML = svg;
-    })
-});
+        links.forEach(link => {
+            const svg = svgMap[link.href];
+            link.innerHTML = svg;
+        })
+    });
+}
 
 var observer = new MutationObserver(function (mutations) {
-
+    update();
 });
-// observer.observe(document.body, { childList: true, subtree: true });
+observer.observe(document.body, { childList: true, subtree: true });
+
+update();
 
 // --------------------------
 
@@ -50,10 +54,9 @@ class Issue {
     ) {}
 }
 
-const BADGE_HEIGHT = 20
-const LABEL_WIDTH  =  8
 
 class BadgeView {
+    static BADGE_HEIGHT = 20;
     static stateColors: { [key: string]: string; } = {
         open   : '6CC644',
         merged : '6E5494',
@@ -70,7 +73,7 @@ class BadgeView {
         return this.numberWidth + this.stateWidth + iconSize/* + this.labelWidth */
     }
     get badgeHeight() {
-        return BADGE_HEIGHT;
+        return BadgeView.BADGE_HEIGHT;
     }
     get numberWidth() { // not so correct :P
         return 15 + this.issue.number.length * 9
