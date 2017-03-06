@@ -33,7 +33,7 @@ export class BadgeView {
     render() {
         const iconSize = this.badgeHeight;
         return `
-<svg class="embed-badge" width="${this.badgeWidth}" height="${this.badgeHeight}">
+<svg class="embed-badge" width="${this.badgeWidth}" height="${this.badgeHeight}" style="border-radius: 3px;">
   <rect x="0" y="0" style="fill:#555"
         width="${this.numberWidth}" height="${this.badgeHeight}" />
   <rect x="${this.numberWidth}" y="0" style="fill:#${this.stateColor}"
