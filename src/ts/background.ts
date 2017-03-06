@@ -38,7 +38,7 @@ chrome.runtime.onMessage.addListener(function(req: string[], sender:any, sendRes
 
         return _fetchIssue(origin, owner, repo, issueNum)
     })).then(issues => {
-        sendResponse(issues)
+        sendResponse(issues.filter(i => i !== undefined))
     }).catch(e => {
         sendResponse() // close sendResponse's connection.
     })
@@ -81,7 +81,13 @@ function _fetchIssue(origin: string, owner: string, repo: string, issueNum: stri
         if (token) {
             xhr.setRequestHeader("Authorization", `token ${token}`)
         }
-        xhr.onload  = function(e) { ok(JSON.parse(xhr.responseText)) }
+        xhr.onload  = function(e) {
+            if (xhr.status >= 400) {
+                ok()
+            } else {
+                ok(JSON.parse(xhr.responseText))
+            }
+        }
         xhr.onerror = function(e) { ng(e) }
         xhr.send();
     })

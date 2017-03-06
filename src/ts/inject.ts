@@ -33,7 +33,9 @@ function update() {
 
         links.forEach(link => {
             const svg = svgMap[link.href];
-            link.innerHTML = svg;
+            if (svg) {
+                link.innerHTML = svg;
+            }
         })
     });
 }
