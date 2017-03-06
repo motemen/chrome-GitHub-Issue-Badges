@@ -6,6 +6,9 @@ function pickupUrls() {
     const links = Array.prototype.slice.call(document.body.querySelectorAll('a.issue-link'))
         .filter((link: HTMLAnchorElement) => !link.querySelector('svg.embed-badge'));
 
+    if (links.length === 0) {
+        return Promise.resolve({ links: [], issues: [] })
+    }
     // TODO: do nothing when links.length is zero.
     return new Promise((ok, ng) => {
         chrome.runtime.sendMessage(
