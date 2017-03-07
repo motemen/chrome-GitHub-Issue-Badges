@@ -1,24 +1,52 @@
-import config = require('./config');
+declare var chrome: any;
+import { Issue } from './issue';
+import { BadgeView } from './badgeView';
 
-function update () {
-  Array.prototype.forEach.call(document.body.querySelectorAll('a.issue-link'), function (link: HTMLAnchorElement) {
-    if (link.querySelector('img.badge')) return;
+function pickupUrls() {
+    const links = Array.prototype.slice.call(document.body.querySelectorAll('a.issue-link'))
+        .filter((link: HTMLAnchorElement) => !link.querySelector('svg.embed-badge'));
 
-    var m = /^https?:\/\/[^\/]+\/([^\/]+)\/([^\/]+)\/(?:issues|pull)\/(\d+)\b/.exec(link.href);
-    var img = document.createElement('img');
-    img.src = config.badgeOrigin + '/badge/' + m[1] + '/' + m[2] + '/' + m[3];
-    img.style.verticalAlign = 'middle';
-    img.classList.add('badge');
-    img.addEventListener('load', function () {
-      link.removeChild(link.firstChild);
-    });
-    link.appendChild(img);
-  });
+    if (links.length === 0) {
+        return Promise.resolve({ links: [], issues: [] })
+    }
+    // TODO: do nothing when links.length is zero.
+    return new Promise((ok, ng) => {
+        chrome.runtime.sendMessage(
+            links.map((link: HTMLAnchorElement) => link.href),
+            function(issues: any[]) { ok({ links, issues }) }
+        )
+    })
 }
 
-update();
+function update() {
+    pickupUrls().then((arg: any) => {
+        const links: HTMLAnchorElement[] = arg.links;
+        const issues: any[] = arg.issues;
+        const svgMap = issues.reduce((svgMap, issueData) => {
+            const user = issueData.assignee || issueData.user
+            const issue = new Issue(
+                issueData.repository_url,
+                '#' + issueData.number,
+                (issueData.merged ? 'merged' : issueData.state),
+                user
+            )
+            const badgeView = new BadgeView(issue)
+            svgMap[issueData.html_url] = badgeView.render() + ' ' + issueData.title;
+            return svgMap;
+        }, <any>{})
+
+        links.forEach(link => {
+            const svg = svgMap[link.href];
+            if (svg) {
+                link.innerHTML = svg;
+            }
+        })
+    });
+}
 
 var observer = new MutationObserver(function (mutations) {
-  update();
+    update();
 });
 observer.observe(document.body, { childList: true, subtree: true });
+
+update();

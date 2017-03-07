@@ -4,7 +4,6 @@
   "manifest_version": 2,
   "description": "",
   "permissions": [
-    "https://github.com/*",
     "webRequest",
     "webRequestBlocking"
   ],
@@ -14,10 +13,5 @@
     ],
     "persistent": true
   },
-  "content_scripts": [
-    {
-      "matches": [ "https://github.com/*" ],
-      "js": [ "js/inject.js" ]
-    }
-  ]
+  "options_page": "html/option_page.html"
 }

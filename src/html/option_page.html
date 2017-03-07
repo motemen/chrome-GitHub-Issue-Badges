@@ -1,0 +1,26 @@
+<html>
+  <head>
+    <script type="text/javascript" src="/js/options.js"></script>
+    <style>
+      input[type="text"] {
+        width: 500px;
+      }
+    </style>
+  </head>
+  <body>
+    <form>
+      <ul>
+        <li class="github-config">
+          <h3>Github</h3>
+          <input type="hidden" name="origin" value="https://github.com" />
+          <input type="hidden" name="api-root" value="https://api.github.com" />
+          <table>
+            <tr><td>token    </td><td><input type="text" name="token" /></td></tr>
+          </table>
+          <button class="test-button" type="button">connection test</button>
+        </li>
+      </ul>
+      <button class="save-button" type="button">save</button>
+    </form>
+  </body>
+</html>
