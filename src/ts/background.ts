@@ -3,22 +3,6 @@ declare var URL: any;
 
 import config = require('./config');
 
-chrome.webRequest.onHeadersReceived.addListener(function (details: any) {
-  var responseHeaders = details.responseHeaders;
-  for (var i = 0; i < responseHeaders.length; ++i) {
-    if (responseHeaders[i].name === 'Content-Security-Policy') {
-      responseHeaders[i].value = responseHeaders[i].value.replace(/\bimg-src\b/, '$& ' + config.badgeOrigin);
-    }
-  }
-
-  return { responseHeaders: responseHeaders };
-}, {
-  urls: [ config.githubOrigin + '/*' ],
-  types: <any>[ 'main_frame' ] // XXX tsd incorrect
-}, [
-  'blocking', 'responseHeaders'
-]);
-
 chrome.tabs.onUpdated.addListener(function(tagId: any, changeInfo: any, tab: any) {
     if (
         changeInfo.status === 'complete' &&
@@ -46,11 +30,7 @@ chrome.runtime.onMessage.addListener(function(req: string[], sender:any, sendRes
 })
 
 function origins():{ [host: string]: { apiRoot: string; token?: string; } } {
-    const mapping: { [host: string]: { apiRoot: string; token?: string; } } = {
-        'https://github.com': {
-            apiRoot: 'https://api.github.com'
-        }
-    };
+    const mapping: { [host: string]: { apiRoot: string; token?: string; } } = {};
     let list: any[] = [];
     if (localStorage.getItem('origins')) {
         try {

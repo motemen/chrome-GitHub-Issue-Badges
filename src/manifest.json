@@ -4,7 +4,6 @@
   "manifest_version": 2,
   "description": "",
   "permissions": [
-    "https://*/*",
     "webRequest",
     "webRequestBlocking"
   ],
@@ -14,6 +13,5 @@
     ],
     "persistent": true
   },
-  "options_page": "html/option_page.html",
-  "content_scripts": []
+  "options_page": "html/option_page.html"
 }

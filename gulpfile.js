@@ -3,55 +3,67 @@ var gulp    = require('gulp'),
     webpack = require('webpack'),
     del     = require('del');
 
-var RE_GITHUB_ORIGIN = /^https:\/\/github\.com\b/;
-
-gulp.task('build', ['bundle', 'manifest', 'html']);
-
-gulp.task('manifest', ['compile'], function () {
-  var extensionConfig = require('./.tmp/js/config.js');
-
-  function rewriteGitHubOrigin (url) {
-    return url.replace(RE_GITHUB_ORIGIN, extensionConfig.githubOrigin);
+const configure = {
+  GITHUB: {
+    name: "Embed GitHub Issue Badges",
+    permissions: [ "https://github.com/*", "https://api.github.com/*" ],
+    scripts: [ "js/init.js" ],
+    options_page: "html/option_page.html"
+  },
+  GHE: {
+    name: "Embed GitHub Issue Badges for Enterprise",
+    permissions: [ "https://*/*" ],
+    scripts: [],
+    options_page: "html/option_page_GHE.html"
   }
+};
 
-  return gulp.src('src/manifest.json')
-    .pipe($.jsonEditor(function (manifest) {
-      manifest.permissions = manifest.permissions.map(rewriteGitHubOrigin);
+["GITHUB", "GHE"].forEach(mode => {
 
-      manifest.content_scripts.forEach(function (contentScript) {
-        contentScript.matches = contentScript.matches.map(rewriteGitHubOrigin);
-      });
+  gulp.task(`manifest:${mode}`, ['compile'], function () {
+    return gulp.src('src/manifest.json')
+      .pipe($.jsonEditor(function (manifest) {
+        manifest.name =
+          configure[mode].name;
+        manifest.permissions =
+          configure[mode].permissions.concat(manifest.permissions);
+        manifest.background.scripts =
+          configure[mode].scripts.concat(manifest.background.scripts);
+        manifest.options_page =
+          configure[mode].options_page;
+        return manifest;
+      }))
+      .pipe(gulp.dest(`build/${mode}/`));
+  });
 
-      return manifest;
-    }))
-    .pipe(gulp.dest('build/'));
-});
+  gulp.task(`html:${mode}`, function() {
+    return gulp.src('src/html/*.html')
+      .pipe(gulp.dest(`build/${mode}/html/`))
+  })
 
-gulp.task('html', function() {
-  return gulp.src('src/html/*.html')
-    .pipe(gulp.dest('build/html/'))
-})
+  gulp.task(`bundle:${mode}`, ['compile'], function (done) {
+    webpack({
+      entry: {
+        background: './.tmp/js/background.js',
+        inject: './.tmp/js/inject.js',
+        options: './.tmp/js/options.js',
+        init: './.tmp/js/init.js'
+      },
+      output: {
+        path: `./build/${mode}/js`,
+        filename: '[name].js'
+      },
+      plugins: [
+        new webpack.optimize.UglifyJsPlugin({
+          output: {
+            beautify: true
+          },
+          compress: false
+        })
+      ]
+    }, done);
+  });
 
-gulp.task('bundle', ['compile'], function (done) {
-  webpack({
-    entry: {
-      background: './.tmp/js/background.js',
-      inject: './.tmp/js/inject.js',
-      options: './.tmp/js/options.js'
-    },
-    output: {
-      path: './build/js',
-      filename: '[name].js'
-    },
-    plugins: [
-      new webpack.optimize.UglifyJsPlugin({
-        output: {
-          beautify: true
-        },
-        compress: false
-      })
-    ]
-  }, done);
 });
 
 gulp.task('compile', function () {
@@ -62,10 +74,15 @@ gulp.task('compile', function () {
     .pipe(gulp.dest('.tmp/js'));
 });
 
+gulp.task('watch', function () {
+  gulp.watch(['src/ts/**/*.ts'], ['bundle:GITHUB', 'bundle:GHE']);
+});
+
+gulp.task('build', [
+  'bundle:GITHUB', 'manifest:GITHUB', 'html:GITHUB',
+  'bundle:GHE', 'manifest:GHE', 'html:GHE'
+]);
+
 gulp.task('clean', del.bind(null, ['build/', '.tmp/']));
 
 gulp.task('default', ['build']);
-
-gulp.task('watch', function () {
-  gulp.watch(['src/ts/**/*.ts'], ['bundle']);
-});

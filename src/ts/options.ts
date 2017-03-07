@@ -10,27 +10,23 @@ function getConfig(elm: any) {
     } : undefined;
 }
 
+function fillInConfig(elm: any, config: any) {
+    if (!(config.origin && config.apiRoot && config.token)) { return }
+    elm.querySelector('[name="origin"]').value = config.origin
+    elm.querySelector('[name="api-root"]').value = config.apiRoot
+    elm.querySelector('[name="token"]').value = config.token
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const configs: any[] = JSON.parse(localStorage.getItem('origins') || '[]');
     configs.forEach(config => {
-        if (config.origin === 'https://github.com') {
-            if (!config.token) { return }
-            const elm: any = document.querySelector('.github-config')
-            elm.querySelector('[name="token"]').value = config.token
-        } else {
-            if (!(config.origin && config.apiRoot && config.token)) { return }
-            const elm: any = document.querySelector('.github-enterprise-config')
-            elm.querySelector('[name="origin"]').value = config.origin
-            elm.querySelector('[name="api-root"]').value = config.apiRoot
-            elm.querySelector('[name="token"]').value = config.token
-        }
+        const elm: any = document.querySelector('.github-config')
+        fillInConfig(elm, config)
     })
 
     document.querySelector('.save-button').addEventListener('click', function(e) {
         const github = getConfig(document.querySelector('.github-config'));
-        const githubEnterprise = getConfig(document.querySelector('.github-enterprise-config'));
-
-        const configs = [github, githubEnterprise].filter(c => c !== undefined)
+        const configs = [github].filter(c => c !== undefined)
         localStorage.setItem('origins', JSON.stringify(configs))
         alert('saved')
     })
