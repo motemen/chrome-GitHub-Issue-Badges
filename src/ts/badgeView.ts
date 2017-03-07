@@ -33,7 +33,7 @@ export class BadgeView {
     render() {
         const iconSize = this.badgeHeight;
         return `
-<svg class="embed-badge" width="${this.badgeWidth}" height="${this.badgeHeight}" style="border-radius: 3px; vertical-align: middle;">
+<svg class="embed-badge" width="${this.badgeWidth}" height="${this.badgeHeight}" style="border-radius: 2px; vertical-align: middle;">
   <rect x="0" y="0" style="fill:#555"
         width="${this.numberWidth}" height="${this.badgeHeight}" />
   <rect x="${this.numberWidth}" y="0" style="fill:#${this.stateColor}"
@@ -45,8 +45,8 @@ export class BadgeView {
         width="${iconSize}" height="${iconSize}"
         xlink:href="${this.issue.assignee.avatar_url}"></image>
   <linearGradient id="cover" x1="0%" y1="0%" x2="0%" y2="100%">
-    <stop offset="0%" stop-color="#bbb" stop-opacity="0.10">
-    <stop offset="100%" stop-color="#000" stop-opacity="0.10">
+    <stop offset="0%" stop-color="#bbb" stop-opacity="0.10"></stop>
+    <stop offset="100%" stop-color="#000" stop-opacity="0.10"></stop>
   </linearGradient>
   <rect x="0" y="0" width="${this.badgeWidth}" height="${this.badgeHeight}" style="fill:url(#cover)" />
   <g style="fill:#fff; text-anchor:middle; font-family:DejaVu Sans,Verdana,Geneva,sans-serif; font-size:11px">
