@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const configs = [github, githubEnterprise].filter(c => c !== undefined)
         localStorage.setItem('origins', JSON.stringify(configs))
+        alert('saved')
     })
 
     Array.prototype.forEach.call(document.querySelectorAll('.test-button'), (button: HTMLButtonElement) => {
