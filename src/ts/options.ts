@@ -24,6 +24,11 @@ document.addEventListener('DOMContentLoaded', function() {
         fillInConfig(elm, config)
     })
 
+    document.querySelector('.github-config [name="origin"]').addEventListener('input', e => {
+        var elm: any = document.querySelector('.github-config [name="api-root"]');
+        elm.value = (<HTMLInputElement>e.target).value + '/api/v3';
+    })
+
     document.querySelector('.save-button').addEventListener('click', function(e) {
         const github = getConfig(document.querySelector('.github-config'));
         const configs = [github].filter(c => c !== undefined)
