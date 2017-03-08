@@ -32,8 +32,7 @@ export class BadgeView {
 
     render() {
         const iconSize = this.badgeHeight;
-        return `
-<svg class="embed-badge" width="${this.badgeWidth}" height="${this.badgeHeight}" style="border-radius: 2px; vertical-align: middle;">
+        return `<svg class="embed-badge" width="${this.badgeWidth}" height="${this.badgeHeight}" style="border-radius: 2px; vertical-align: middle; margin-right: 0.3em">
   <rect x="0" y="0" style="fill:#555"
         width="${this.numberWidth}" height="${this.badgeHeight}" />
   <rect x="${this.numberWidth}" y="0" style="fill:#${this.stateColor}"
@@ -55,7 +54,6 @@ export class BadgeView {
     <text x="${this.numberWidth+this.stateWidth/2}" y="15" style="fill:#010100; fill-opacity: .3">${this.issue.state}</text>
     <text x="${this.numberWidth+this.stateWidth/2}" y="14">${this.issue.state}</text>
   </g>
-</svg>
-`
+</svg>`
     }
 }

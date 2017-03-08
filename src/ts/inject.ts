@@ -31,7 +31,7 @@ function update() {
                 user
             )
             const badgeView = new BadgeView(issue)
-            svgMap[issueData.html_url] = badgeView.render() + ' ' + issueData.title;
+            svgMap[issueData.html_url] = badgeView.render() + issueData.title;
             return svgMap;
         }, <any>{})
 
