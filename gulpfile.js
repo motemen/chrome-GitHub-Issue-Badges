@@ -5,13 +5,13 @@ var gulp    = require('gulp'),
 
 const configure = {
   GITHUB: {
-    name: "Embed GitHub Issue Badges",
+    name: "GitHub Issue Badges",
     permissions: [ "https://github.com/*", "https://api.github.com/*" ],
     scripts: [ "js/init.js" ],
     options_page: "html/option_page.html"
   },
   GHE: {
-    name: "Embed GitHub Issue Badges for Enterprise",
+    name: "GitHub Issue Badges (for Enterprise)",
     permissions: [ "https://*/*" ],
     scripts: [],
     options_page: "html/option_page_GHE.html"
