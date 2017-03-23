@@ -7,11 +7,12 @@ export class BadgeView {
         merged : '6E5494',
         closed : 'BD2C00'
     };
-    issue: Issue;
 
-    constructor(issue: Issue/* badgeHeight, labelWidth */) {
-        this.issue = issue;
-    }
+    constructor(
+        private issue: Issue/* badgeHeight, labelWidth */,
+        private maxNumberLength: number,
+        private maxStateLength: number
+    ) {}
 
     get badgeWidth() {
         const iconSize = this.badgeHeight;
@@ -21,10 +22,10 @@ export class BadgeView {
         return BadgeView.BADGE_HEIGHT;
     }
     get numberWidth() { // not so correct :P
-        return 15 + this.issue.number.length * 9
+        return 15 + this.maxNumberLength * 9;
     }
     get stateWidth() { // not so correct :P
-        return 10 + this.issue.state.length * 7
+        return 10 + this.maxStateLength * 7;
     }
     get stateColor() {
         return BadgeView.stateColors[this.issue.state];
