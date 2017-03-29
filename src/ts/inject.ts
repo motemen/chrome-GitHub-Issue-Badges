@@ -22,6 +22,10 @@ function update() {
     pickupUrls().then((arg: any) => {
         const links: HTMLAnchorElement[] = arg.links;
         const issues: any[] = arg.issues;
+
+        const maxNumberLength = Math.max.apply(null, issues.map(i => i.number.toString().length));
+        const maxStateLength = Math.max.apply(null, issues.map(i => i.state.length));
+
         const svgMap = issues.reduce((svgMap, issueData) => {
             const user = issueData.assignee || issueData.user
             const issue = new Issue(
@@ -30,7 +34,7 @@ function update() {
                 (issueData.merged ? 'merged' : issueData.state),
                 user
             )
-            const badgeView = new BadgeView(issue)
+            const badgeView = new BadgeView(issue, maxNumberLength, maxStateLength)
             svgMap[issueData.html_url] = badgeView.render() + issueData.title;
             return svgMap;
         }, <any>{})
