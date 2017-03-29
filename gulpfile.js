@@ -64,6 +64,14 @@ const configure = {
     }, done);
   });
 
+  gulp.task(`build:${mode}`, [ 'bundle', 'manifest', 'html' ].map((name) => `${name}:${mode}`));
+
+  gulp.task(`dist:${mode}`, [ `build:${mode}` ], function () {
+    const version = require(`./build/${mode}/manifest.json`).version;
+    gulp.src(`build/${mode}/**/*`)
+      .pipe($.zip(`${mode}-${version}.zip`))
+      .pipe(gulp.dest('dist'));
+  });
 });
 
 var project = $.typescript.createProject('tsconfig.json');
@@ -79,10 +87,9 @@ gulp.task('watch', function () {
   gulp.watch(['src/ts/**/*.ts'], ['bundle:GITHUB', 'bundle:GHE']);
 });
 
-gulp.task('build', [
-  'bundle:GITHUB', 'manifest:GITHUB', 'html:GITHUB',
-  'bundle:GHE', 'manifest:GHE', 'html:GHE'
-]);
+gulp.task('build', [ 'build:GITHUB', 'build:GHE' ]);
+
+gulp.task('dist', [ 'dist:GITHUB', 'dist:GHE' ]);
 
 gulp.task('clean', del.bind(null, ['build/', '.tmp/']));
 

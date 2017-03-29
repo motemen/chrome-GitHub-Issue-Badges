@@ -1,5 +1,5 @@
 {
-  "name": "chrome-Embed-GitHub-Issue-Badges",
+  "name": "chrome-GitHub-Issue-Badges",
   "version": "0.0.0",
   "description": "",
   "scripts": {
@@ -15,6 +15,7 @@
     "gulp-load-plugins": "^0.7.0",
     "gulp-plumber": "^0.6.6",
     "gulp-typescript": "^3.1.6",
+    "gulp-zip": "^4.0.0",
     "typescript": "^2.0.3",
     "webpack": "^1.4.8"
   },
