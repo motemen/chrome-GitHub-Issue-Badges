@@ -18,6 +18,14 @@ function pickupUrls() {
     })
 }
 
+function escapeHTML(str: string) {
+    return str.replace(/&/g, '&amp;')
+              .replace(/</g, '&lt;')
+              .replace(/>/g, '&gt;')
+              .replace(/"/g, '&quot;')
+              .replace(/'/g, '&#039;');
+}
+
 function update() {
     pickupUrls().then((arg: any) => {
         const links: HTMLAnchorElement[] = arg.links;
@@ -35,7 +43,7 @@ function update() {
                 user
             )
             const badgeView = new BadgeView(issue, maxNumberLength, maxStateLength)
-            svgMap[issueData.html_url] = badgeView.render() + issueData.title;
+            svgMap[issueData.html_url] = badgeView.render() + escapeHTML(issueData.title);
             return svgMap;
         }, <any>{})
 
