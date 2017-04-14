@@ -18,10 +18,22 @@ function pickupUrls() {
     })
 }
 
+function escapeHTML(str: string) {
+    return str.replace(/&/g, '&amp;')
+              .replace(/</g, '&lt;')
+              .replace(/>/g, '&gt;')
+              .replace(/"/g, '&quot;')
+              .replace(/'/g, '&#039;');
+}
+
 function update() {
     pickupUrls().then((arg: any) => {
         const links: HTMLAnchorElement[] = arg.links;
         const issues: any[] = arg.issues;
+
+        const maxNumberLength = Math.max.apply(null, issues.map(i => i.number.toString().length));
+        const maxStateLength = Math.max.apply(null, issues.map(i => i.state.length));
+
         const svgMap = issues.reduce((svgMap, issueData) => {
             const user = issueData.assignee || issueData.user
             const issue = new Issue(
@@ -30,8 +42,8 @@ function update() {
                 (issueData.merged ? 'merged' : issueData.state),
                 user
             )
-            const badgeView = new BadgeView(issue)
-            svgMap[issueData.html_url] = badgeView.render() + issueData.title;
+            const badgeView = new BadgeView(issue, maxNumberLength, maxStateLength)
+            svgMap[issueData.html_url] = badgeView.render() + escapeHTML(issueData.title);
             return svgMap;
         }, <any>{})
 
