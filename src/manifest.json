@@ -4,6 +4,7 @@
   "manifest_version": 2,
   "description": "",
   "permissions": [
+    "tabs"
   ],
   "background": {
     "scripts": [

@@ -3,7 +3,7 @@ declare var URL: any;
 
 import config = require('./config');
 
-chrome.tabs.onUpdated.addListener(function(tagId: any, changeInfo: any, tab: any) {
+chrome.tabs.onUpdated.addListener(function(tabId: any, changeInfo: any, tab: any) {
     if (
         changeInfo.status === 'complete' &&
         tab.url &&
