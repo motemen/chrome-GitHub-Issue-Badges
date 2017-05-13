@@ -16,6 +16,7 @@ enum TokenStatus {
 interface OptionProps {
   saveConfigs: (configs: List<Config>) => void;
   configs: List<Config>;
+  github: boolean;
 }
 
 interface OptionState {
@@ -134,18 +135,21 @@ class App extends React.PureComponent<OptionProps, OptionState> {
   }
 
   render() {
+    const github = this.props.github;
     const configs = this.state.configs;
     return <div>
-      <h3>GitHub Enterprise</h3>
-      <button type="button" onClick={this.addItem}>Add</button>
+      <h3>Access Token</h3>
+      { !github && <button type="button" onClick={this.addItem}>Add</button> }
       <button type="button" onClick={this.saveConfigs}>Save</button>
       {
         configs.map((config, index) => {
           return <div key={index}>
-            <button type="button" onClick={() => {this.removeItem(index)}}>remove</button>
+            { !github &&
+              <button type="button" onClick={() => {this.removeItem(index)}}>remove</button>
+            }
             <ul>
               <li>origin  <input type="text" value={config.origin} onChange={this.onOriginChanged(config, index)} /></li>
-              <li>api root<input type="text" value={config.apiRoot} disabled onChange={this.onAPIRootChanged(config, index)} /></li>
+              <li>api root<input type="text" value={config.apiRoot} disabled={github} onChange={this.onAPIRootChanged(config, index)} /></li>
               <li>token   <input type="text" value={config.token} onChange={this.onTokenChanged(config, index)} />
               <button type="button" onClick={() => {this.updateStatus(index)}}>{statusButton(config.status)}</button></li>
             </ul>
@@ -165,14 +169,15 @@ function isConfig(config: any): config is Config {
 }
 
 const origins: any[] = JSON.parse(localStorage.getItem('origins') || '[]');
-const configs: Config[] = origins.reduce((acc: Config[], v: any) => {
-  if (isConfig(v)) {
-    acc.push(v);
+const configs: Config[] = origins.filter(isConfig);
+const github: boolean = ((mode?: string) => {
+  if (mode) {
+    return mode == 'github';
   }
-  return acc;
-}, []);
+  return false;
+})(localStorage.getItem('mode'));
 
 ReactDOM.render(
-  <App saveConfigs={saveConfigs} configs={List(configs)} />,
+  <App saveConfigs={saveConfigs} configs={List(configs)} github={github} />,
   document.getElementById('app')
 );
