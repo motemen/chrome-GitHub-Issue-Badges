@@ -22,6 +22,14 @@ interface OptionState {
   configs: List<Config>;
 }
 
+function statusButton(status: TokenStatus): string {
+  switch (status) {
+    case TokenStatus.verified:  return 'verified';
+    case TokenStatus.unchecked: return 'connection test';
+    case TokenStatus.failed:    return 'failed';
+  }
+}
+
 class App extends React.PureComponent<OptionProps, OptionState> {
   constructor(props: OptionProps) {
     super(props);
@@ -34,6 +42,7 @@ class App extends React.PureComponent<OptionProps, OptionState> {
     this.updateStatus = this.updateStatus.bind(this);
     this.saveConfigs = this.saveConfigs.bind(this);
     this.onOriginChanged = this.onOriginChanged.bind(this);
+    this.onAPIRootChanged = this.onAPIRootChanged.bind(this);
     this.onTokenChanged = this.onTokenChanged.bind(this);
   }
 
@@ -63,13 +72,19 @@ class App extends React.PureComponent<OptionProps, OptionState> {
     const config = this.state.configs.get(i);
     if (config === undefined && config.apiRoot === undefined) {
       updateStatus(config, TokenStatus.unchecked);
+      return;
+    }
+    if (config.token === '') {
+      updateStatus(config, TokenStatus.unchecked);
+      alert('please input your access token');
+      return;
     }
 
     const xhr = new XMLHttpRequest();
     xhr.open("GET", config.apiRoot);
     xhr.setRequestHeader("Authorization", `token ${config.token}`)
-    xhr.onload  = function(e) {
-      updateStatus(config, TokenStatus.verified);
+    xhr.onload = function(e) {
+      updateStatus(config, xhr.status === 200 ? TokenStatus.verified : TokenStatus.failed);
     }
     xhr.onerror = function(e) {
       updateStatus(config, TokenStatus.failed);
@@ -87,6 +102,18 @@ class App extends React.PureComponent<OptionProps, OptionState> {
       const newConfig = Map(config)
         .update('origin', o => origin)
         .update('apiRoot', a => (origin === 'https://github.com') ? 'https://api.github.com' : (origin + '/api/v3'))
+        .toJS();
+      this.setState(({configs}) => ({
+        configs: configs.set(i, newConfig),
+      }));
+    }
+  }
+
+  onAPIRootChanged(config: Config, i: number): (event: React.ChangeEvent<HTMLInputElement>) => void {
+    return (event) => {
+      const origin = event.target.value;
+      const newConfig = Map(config)
+        .update('apiRoot', a => event.target.value)
         .toJS();
       this.setState(({configs}) => ({
         configs: configs.set(i, newConfig),
@@ -118,9 +145,9 @@ class App extends React.PureComponent<OptionProps, OptionState> {
             <button type="button" onClick={() => {this.removeItem(index)}}>remove</button>
             <ul>
               <li>origin  <input type="text" value={config.origin} onChange={this.onOriginChanged(config, index)} /></li>
-              <li>api root<input type="text" value={config.apiRoot} disabled /></li>
+              <li>api root<input type="text" value={config.apiRoot} disabled onChange={this.onAPIRootChanged(config, index)} /></li>
               <li>token   <input type="text" value={config.token} onChange={this.onTokenChanged(config, index)} />
-              <button type="button" onClick={() => {this.updateStatus(index)}}>connection test</button></li>
+              <button type="button" onClick={() => {this.updateStatus(index)}}>{statusButton(config.status)}</button></li>
             </ul>
           </div>;
         })
