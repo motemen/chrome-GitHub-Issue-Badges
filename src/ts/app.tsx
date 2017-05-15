@@ -169,7 +169,7 @@ function isConfig(config: any): config is Config {
 }
 
 const origins: any[] = JSON.parse(localStorage.getItem('origins') || '[]');
-const configs: Config[] = origins.filter(isConfig);
+const configs: List<Config> = List(origins.filter(isConfig));
 const github: boolean = ((mode?: string) => {
   if (mode) {
     return mode == 'github';
@@ -178,6 +178,6 @@ const github: boolean = ((mode?: string) => {
 })(localStorage.getItem('mode'));
 
 ReactDOM.render(
-  <App saveConfigs={saveConfigs} configs={List(configs)} github={github} />,
+  <App {...{saveConfigs, configs, github}} />,
   document.getElementById('app')
 );
