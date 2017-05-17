@@ -35,9 +35,9 @@ export class BadgeView {
         const iconSize = this.badgeHeight;
         const icons = this.issue.assignees.map((user, idx) => `
             <image x="${this.numberWidth + this.stateWidth + iconSize * idx}" y="0"
-                width="${iconSize}" height="${iconSize}"
-                xlink:href="${user.avatar_url}"></image>
-        `)
+                   width="${iconSize}" height="${iconSize}"
+                   xlink:href="${user.avatar_url}"></image>
+        `);
 
         return `<svg class="embed-badge" width="${this.badgeWidth}" height="${this.badgeHeight}" style="border-radius: 2px; vertical-align: middle; margin-right: 0.3em">
   <rect x="0" y="0" style="fill:#555"
@@ -47,7 +47,7 @@ export class BadgeView {
   <rect x="${this.numberWidth + this.stateWidth}" y="0" style="fill:#999"
         width="${this.badgeWidth}" height="${this.badgeHeight}" />
   <!-- TODO: labels -->
-  ${icons}
+  ${icons.join('')}
   <linearGradient id="cover" x1="0%" y1="0%" x2="0%" y2="100%">
     <stop offset="0%" stop-color="#bbb" stop-opacity="0.10"></stop>
     <stop offset="100%" stop-color="#000" stop-opacity="0.10"></stop>
