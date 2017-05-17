@@ -21,6 +21,7 @@ interface OptionProps {
 
 interface OptionState {
   configs: List<Config>;
+  newGithub: string;
 }
 
 function statusButton(status: TokenStatus): string {
@@ -35,23 +36,27 @@ class App extends React.PureComponent<OptionProps, OptionState> {
   constructor(props: OptionProps) {
     super(props);
     this.state = {
-      configs: List(props.configs)
+      configs: List(props.configs),
+      newGithub: ''
     };
 
     this.addItem = this.addItem.bind(this);
     this.removeItem = this.removeItem.bind(this);
     this.updateStatus = this.updateStatus.bind(this);
     this.saveConfigs = this.saveConfigs.bind(this);
-    this.onOriginChanged = this.onOriginChanged.bind(this);
     this.onAPIRootChanged = this.onAPIRootChanged.bind(this);
     this.onTokenChanged = this.onTokenChanged.bind(this);
   }
 
   addItem() {
-    let config: Config = { origin: '', apiRoot: '', token: '', status: TokenStatus.unchecked }
-    this.setState(({configs}) => ({
-      configs: configs.push(config)
-    }));
+    const newGithub = this.state.newGithub;
+    if (this.state.configs.filter(({origin}) => (origin === newGithub)).isEmpty) {
+      let config: Config = { origin: newGithub, apiRoot: '', token: '', status: TokenStatus.unchecked }
+      this.setState(({configs}) => ({
+        configs: configs.push(config),
+        newGithub: '',
+      }));
+    }
   }
 
   removeItem(i: number) {
@@ -97,19 +102,6 @@ class App extends React.PureComponent<OptionProps, OptionState> {
     this.props.saveConfigs(this.state.configs);
   }
 
-  onOriginChanged(config: Config, i: number): (event: React.ChangeEvent<HTMLInputElement>) => void {
-    return (event) => {
-      const origin = event.target.value;
-      const newConfig = Map(config)
-        .update('origin', o => origin)
-        .update('apiRoot', a => (origin === 'https://github.com') ? 'https://api.github.com' : (origin + '/api/v3'))
-        .toJS();
-      this.setState(({configs}) => ({
-        configs: configs.set(i, newConfig),
-      }));
-    }
-  }
-
   onAPIRootChanged(config: Config, i: number): (event: React.ChangeEvent<HTMLInputElement>) => void {
     return (event) => {
       const origin = event.target.value;
@@ -138,22 +130,43 @@ class App extends React.PureComponent<OptionProps, OptionState> {
     const github = this.props.github;
     const configs = this.state.configs;
     return <div>
-      <h3>Access Token</h3>
-      { !github && <button type="button" onClick={this.addItem}>Add</button> }
+      <h2>Access Token</h2>
       <button type="button" onClick={this.saveConfigs}>Save</button>
+      { !github &&
+        <form>
+          <input
+            type="text"
+            placeholder="Input GitHub URL"
+            value={this.state.newGithub}
+            onChange={
+              (e) => {
+                const newValue = e.target.value;
+                this.setState(({newGithub}) => ({newGithub: newValue,}))
+              }
+            }
+            />
+          <button type="button" onClick={this.addItem}>Add</button>
+        </form>
+      }
       {
         configs.map((config, index) => {
-          return <div key={index}>
+          return <section key={config.origin}>
+            <h3>{config.origin}</h3>
+            <table>
+              <tr>
+                <td>api root</td>
+                <td><input type="text" value={config.apiRoot} disabled={github} onChange={this.onAPIRootChanged(config, index)} /></td>
+              </tr>
+              <tr>
+                <td>token</td>
+                <td><input type="text" value={config.token} onChange={this.onTokenChanged(config, index)} /></td>
+                <td><button type="button" onClick={() => {this.updateStatus(index)}}>{statusButton(config.status)}</button></td>
+              </tr>
+            </table>
             { !github &&
               <button type="button" onClick={() => {this.removeItem(index)}}>remove</button>
             }
-            <ul>
-              <li>origin  <input type="text" value={config.origin} onChange={this.onOriginChanged(config, index)} /></li>
-              <li>api root<input type="text" value={config.apiRoot} disabled={github} onChange={this.onAPIRootChanged(config, index)} /></li>
-              <li>token   <input type="text" value={config.token} onChange={this.onTokenChanged(config, index)} />
-              <button type="button" onClick={() => {this.updateStatus(index)}}>{statusButton(config.status)}</button></li>
-            </ul>
-          </div>;
+          </section>;
         })
       }
     </div>;
@@ -169,7 +182,7 @@ function isConfig(config: any): config is Config {
 }
 
 const origins: any[] = JSON.parse(localStorage.getItem('origins') || '[]');
-const configs: List<Config> = List(origins.filter(isConfig));
+const configs: Config[] = origins.filter(isConfig);
 const github: boolean = ((mode?: string) => {
   if (mode) {
     return mode == 'github';
@@ -178,6 +191,6 @@ const github: boolean = ((mode?: string) => {
 })(localStorage.getItem('mode'));
 
 ReactDOM.render(
-  <App {...{saveConfigs, configs, github}} />,
+  <App saveConfigs={saveConfigs} configs={List(configs)} github={github} />,
   document.getElementById('app')
 );
