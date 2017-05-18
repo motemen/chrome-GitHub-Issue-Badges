@@ -35,12 +35,12 @@ function update() {
         const maxStateLength = Math.max.apply(null, issues.map(i => i.state.length));
 
         const svgMap = issues.reduce((svgMap, issueData) => {
-            const user = issueData.assignee || issueData.user
+            const users = issueData.assignees.length > 0 ? issueData.assignees : [ issueData.user ]
             const issue = new Issue(
                 issueData.repository_url,
                 '#' + issueData.number,
                 (issueData.merged ? 'merged' : issueData.state),
-                user
+                users,
             )
             const badgeView = new BadgeView(issue, maxNumberLength, maxStateLength)
             svgMap[issueData.html_url] = badgeView.render() + escapeHTML(issueData.title);

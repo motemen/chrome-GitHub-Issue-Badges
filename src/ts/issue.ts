@@ -3,6 +3,6 @@ export class Issue {
         public repo: string,
         public number: string,
         public state: string,
-        public assignee: { avatar_url: string }
+        public assignees: [ { avatar_url: string } ]
     ) {}
 }
