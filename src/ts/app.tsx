@@ -131,7 +131,7 @@ class App extends React.PureComponent<OptionProps, OptionState> {
     const configs = this.state.configs;
     return <div>
       <h2>Access Token</h2>
-      <button type="button" onClick={this.saveConfigs}>Save</button>
+      <button className="test-button" type="button" onClick={this.saveConfigs}>Save</button>
       { !github &&
         <form>
           <input
@@ -145,7 +145,7 @@ class App extends React.PureComponent<OptionProps, OptionState> {
               }
             }
             />
-          <button type="button" onClick={this.addItem}>Add</button>
+          <button className="test-button" type="button" onClick={this.addItem}>Add</button>
         </form>
       }
       {
@@ -160,7 +160,7 @@ class App extends React.PureComponent<OptionProps, OptionState> {
               <tr>
                 <td>token</td>
                 <td><input type="text" value={config.token} onChange={this.onTokenChanged(config, index)} /></td>
-                <td><button type="button" onClick={() => {this.updateStatus(index)}}>{statusButton(config.status)}</button></td>
+                <td><button className="test-button" type="button" onClick={() => {this.updateStatus(index)}}>{statusButton(config.status)}</button></td>
               </tr>
             </table>
             { !github &&
