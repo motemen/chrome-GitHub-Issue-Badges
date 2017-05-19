@@ -47,7 +47,6 @@ const configure = {
         app: './.tmp/js/app.js',
         background: './.tmp/js/background.js',
         inject: './.tmp/js/inject.js',
-        options: './.tmp/js/options.js',
         init: './.tmp/js/init.js'
       },
       output: {
