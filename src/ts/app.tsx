@@ -44,8 +44,7 @@ class App extends React.PureComponent<OptionProps, OptionState> {
     this.removeItem = this.removeItem.bind(this);
     this.updateStatus = this.updateStatus.bind(this);
     this.saveConfigs = this.saveConfigs.bind(this);
-    this.onAPIRootChanged = this.onAPIRootChanged.bind(this);
-    this.onTokenChanged = this.onTokenChanged.bind(this);
+    this.onConfigChanged = this.onConfigChanged.bind(this);
   }
 
   addItem() {
@@ -103,28 +102,13 @@ class App extends React.PureComponent<OptionProps, OptionState> {
     this.props.saveConfigs(this.state.configs);
   }
 
-  onAPIRootChanged(config: Config, i: number): (event: React.ChangeEvent<HTMLInputElement>) => void {
-    return (event) => {
-      const origin = event.target.value;
-      const newConfig = Map(config)
-        .update('apiRoot', a => event.target.value)
-        .toJS();
-      this.setState(({configs}) => ({
-        configs: configs.set(i, newConfig),
-      }));
-    }
-  }
-
-  onTokenChanged(config: Config, i: number): (event: React.ChangeEvent<HTMLInputElement>) => void {
-    return (event) => {
-      const config = this.state.configs.get(i);
-      const newConfig = Map(config)
-        .update('token', t => event.target.value)
-        .toJS();
-      this.setState(({configs}) => ({
-        configs: configs.set(i, newConfig),
-      }));
-    }
+  onConfigChanged(i: number, key: string): (event: React.ChangeEvent<HTMLInputElement>) => void {
+     return (event) => {
+       const value = event.target.value;
+       this.setState(({configs}) => ({
+         configs: configs.update(i, (config) => Map(config).update(key, a => value).toJS()),
+       }));
+     };
   }
 
   render() {
@@ -156,11 +140,11 @@ class App extends React.PureComponent<OptionProps, OptionState> {
             <table>
               <tr>
                 <td>api root</td>
-                <td><input type="text" value={config.apiRoot} disabled={github} onChange={this.onAPIRootChanged(config, index)} /></td>
+                <td><input type="text" value={config.apiRoot} disabled={github} onChange={this.onConfigChanged(index, 'apiRoot')} /></td>
               </tr>
               <tr>
                 <td>token</td>
-                <td><input type="text" value={config.token} onChange={this.onTokenChanged(config, index)} /></td>
+                <td><input type="text" value={config.token} onChange={this.onConfigChanged(index, 'token')} /></td>
                 <td><button className="test-button" type="button" onClick={() => {this.updateStatus(index)}}>{statusButton(config.status)}</button></td>
               </tr>
             </table>
