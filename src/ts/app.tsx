@@ -138,15 +138,17 @@ class App extends React.PureComponent<OptionProps, OptionState> {
           return <section key={config.origin}>
             <h3>{config.origin}</h3>
             <table>
-              <tr>
-                <td>api root</td>
-                <td><input type="text" value={config.apiRoot} disabled={github} onChange={this.onConfigChanged(index, 'apiRoot')} /></td>
-              </tr>
-              <tr>
-                <td>token</td>
-                <td><input type="text" value={config.token} onChange={this.onConfigChanged(index, 'token')} /></td>
-                <td><button className="test-button" type="button" onClick={() => {this.updateStatus(index)}}>{statusButton(config.status)}</button></td>
-              </tr>
+              <tbody>
+                <tr>
+                  <td>api root</td>
+                  <td><input type="text" value={config.apiRoot} disabled={github} onChange={this.onConfigChanged(index, 'apiRoot')} /></td>
+                </tr>
+                <tr>
+                  <td>token</td>
+                  <td><input type="text" value={config.token} onChange={this.onConfigChanged(index, 'token')} /></td>
+                  <td><button className="test-button" type="button" onClick={() => {this.updateStatus(index)}}>{statusButton(config.status)}</button></td>
+                </tr>
+              </tbody>
             </table>
             { !github &&
               <button type="button" onClick={() => {this.removeItem(index)}}>remove</button>
