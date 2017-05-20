@@ -50,7 +50,7 @@ class App extends React.PureComponent<OptionProps, OptionState> {
   addItem() {
     const newGithub = this.state.newGithub;
     const apiRoot = (newGithub === 'https://github.com') ? 'https://api.github.com' : (newGithub + '/api/v3')
-    if (this.state.configs.filter(({origin}) => (origin === newGithub)).isEmpty) {
+    if (newGithub !== '' && this.state.configs.filter(({origin}) => (origin === newGithub)).isEmpty) {
       let config: Config = { origin: newGithub, apiRoot: apiRoot, token: '', status: TokenStatus.unchecked }
       this.setState(({configs}) => ({
         configs: configs.push(config),
