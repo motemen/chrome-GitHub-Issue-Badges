@@ -24,12 +24,16 @@ interface OptionState {
   newGithub: string;
 }
 
-function statusButton(status: TokenStatus): string {
-  switch (status) {
-    case TokenStatus.verified:  return 'verified';
-    case TokenStatus.unchecked: return 'connection test';
-    case TokenStatus.failed:    return 'failed';
-  }
+const TokenStatusButton: React.StatelessComponent<{status: TokenStatus} & React.HTMLProps<HTMLButtonElement>> = (props) => {
+  const {status, ...otherProps} = props;
+  const text = ((status) => {
+    switch (status) {
+      case TokenStatus.verified:  return 'verified';
+      case TokenStatus.unchecked: return 'connection test';
+      case TokenStatus.failed:    return 'failed';
+    }
+  })(status);
+  return <button {...otherProps}>{text}</button>;
 }
 
 class App extends React.PureComponent<OptionProps, OptionState> {
@@ -146,7 +150,7 @@ class App extends React.PureComponent<OptionProps, OptionState> {
                 <tr>
                   <td>token</td>
                   <td><input type="text" value={config.token} onChange={this.onConfigChanged(index, 'token')} /></td>
-                  <td><button className="test-button" type="button" onClick={() => {this.updateStatus(index)}}>{statusButton(config.status)}</button></td>
+                  <td><TokenStatusButton className="test-button" type="button" onClick={() => {this.updateStatus(index)}} status={config.status} /></td>
                 </tr>
               </tbody>
             </table>
