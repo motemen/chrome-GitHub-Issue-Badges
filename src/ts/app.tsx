@@ -89,9 +89,11 @@ class App extends React.PureComponent<OptionProps, OptionState> {
     xhr.setRequestHeader("Authorization", `token ${config.token}`)
     xhr.onload = function(e) {
       updateTokenStatus(config, xhr.status === 200 ? TokenStatus.verified : TokenStatus.failed);
+      alert(xhr.responseText);
     }
     xhr.onerror = function(e) {
       updateTokenStatus(config, TokenStatus.failed);
+      alert(xhr.responseText);
     }
     xhr.send();
   }
