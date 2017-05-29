@@ -43,19 +43,13 @@ class App extends React.PureComponent<OptionProps, OptionState> {
       configs: List(props.configs),
       newGithub: ''
     };
-
-    this.addItem = this.addItem.bind(this);
-    this.removeItem = this.removeItem.bind(this);
-    this.updateStatus = this.updateStatus.bind(this);
-    this.saveConfigs = this.saveConfigs.bind(this);
-    this.onConfigChanged = this.onConfigChanged.bind(this);
   }
 
-  addItem() {
+  addItem = () => {
     const newGithub = this.state.newGithub;
-    const apiRoot = (newGithub === 'https://github.com') ? 'https://api.github.com' : (newGithub + '/api/v3')
     if (newGithub !== '' && this.state.configs.filter(({origin}) => (origin === newGithub)).isEmpty) {
-      let config: Config = { origin: newGithub, apiRoot: apiRoot, token: '', status: TokenStatus.unchecked }
+      const apiRoot = (newGithub === 'https://github.com') ? 'https://api.github.com' : (newGithub + '/api/v3')
+      const config: Config = { origin: newGithub, apiRoot: apiRoot, token: '', status: TokenStatus.unchecked }
       this.setState(({configs}) => ({
         configs: configs.push(config),
         newGithub: '',
@@ -63,14 +57,14 @@ class App extends React.PureComponent<OptionProps, OptionState> {
     }
   }
 
-  removeItem(i: number) {
+  removeItem = (i: number) => {
     this.setState(({configs}) => ({
       configs: configs.delete(i)
     }));
   }
 
-  updateStatus(i: number) {
-    const updateStatus = (config: Config, status: TokenStatus) => {
+  updateTokenStatus = (i: number) => {
+    const updateTokenStatus = (config: Config, status: TokenStatus) => {
       const newConfig = Map(config)
         .update('status', s => status)
         .toJS();
@@ -80,12 +74,12 @@ class App extends React.PureComponent<OptionProps, OptionState> {
     };
 
     const config = this.state.configs.get(i);
-    if (config === undefined && config.apiRoot === undefined) {
-      updateStatus(config, TokenStatus.unchecked);
+    if (config === undefined || config.apiRoot === undefined) {
+      updateTokenStatus(config, TokenStatus.unchecked);
       return;
     }
     if (config.token === '') {
-      updateStatus(config, TokenStatus.unchecked);
+      updateTokenStatus(config, TokenStatus.unchecked);
       alert('please input your access token');
       return;
     }
@@ -94,19 +88,19 @@ class App extends React.PureComponent<OptionProps, OptionState> {
     xhr.open("GET", config.apiRoot);
     xhr.setRequestHeader("Authorization", `token ${config.token}`)
     xhr.onload = function(e) {
-      updateStatus(config, xhr.status === 200 ? TokenStatus.verified : TokenStatus.failed);
+      updateTokenStatus(config, xhr.status === 200 ? TokenStatus.verified : TokenStatus.failed);
     }
     xhr.onerror = function(e) {
-      updateStatus(config, TokenStatus.failed);
+      updateTokenStatus(config, TokenStatus.failed);
     }
     xhr.send();
   }
 
-  saveConfigs() {
+  saveConfigs = () => {
     this.props.saveConfigs(this.state.configs);
   }
 
-  onConfigChanged(i: number, key: string): (event: React.ChangeEvent<HTMLInputElement>) => void {
+  onConfigChanged = (i: number, key: string): (event: React.ChangeEvent<HTMLInputElement>) => void => {
      return (event) => {
        const value = event.target.value;
        this.setState(({configs}) => ({
@@ -150,7 +144,7 @@ class App extends React.PureComponent<OptionProps, OptionState> {
                 <tr>
                   <td>token</td>
                   <td><input type="text" value={config.token} onChange={this.onConfigChanged(index, 'token')} /></td>
-                  <td><TokenStatusButton className="test-button" type="button" onClick={() => {this.updateStatus(index)}} status={config.status} /></td>
+                  <td><TokenStatusButton className="test-button" type="button" onClick={() => {this.updateTokenStatus(index)}} status={config.status} /></td>
                 </tr>
               </tbody>
             </table>
@@ -174,12 +168,7 @@ function isConfig(config: any): config is Config {
 
 const origins: any[] = JSON.parse(localStorage.getItem('origins') || '[]');
 const configs: Config[] = origins.filter(isConfig);
-const github: boolean = ((mode?: string) => {
-  if (mode) {
-    return mode == 'github';
-  }
-  return false;
-})(localStorage.getItem('mode'));
+const github: boolean = localStorage.getItem('mode') === 'github';
 
 ReactDOM.render(
   <App saveConfigs={saveConfigs} configs={List(configs)} github={github} />,
