@@ -44,9 +44,9 @@ const configure = {
   gulp.task(`bundle:${mode}`, ['compile'], function (done) {
     webpack({
       entry: {
+        app: './.tmp/js/app.js',
         background: './.tmp/js/background.js',
         inject: './.tmp/js/inject.js',
-        options: './.tmp/js/options.js',
         init: './.tmp/js/init.js'
       },
       output: {
@@ -76,7 +76,7 @@ const configure = {
 
 var project = $.typescript.createProject('tsconfig.json');
 gulp.task('compile', function () {
-  return gulp.src('src/ts/**/*.ts')
+  return gulp.src('src/ts/**/*.{ts,tsx}')
     .pipe($.changed('.tmp/js', { extension: '.js' }))
     .pipe($.plumber())
     .pipe(project())
@@ -84,7 +84,7 @@ gulp.task('compile', function () {
 });
 
 gulp.task('watch', function () {
-  gulp.watch(['src/ts/**/*.ts'], ['bundle:GITHUB', 'bundle:GHE']);
+  gulp.watch(['src/ts/**/*.{ts,tsx}'], ['bundle:GITHUB', 'bundle:GHE']);
 });
 
 gulp.task('build', [ 'build:GITHUB', 'build:GHE' ]);

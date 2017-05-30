@@ -1,6 +1,5 @@
 <html>
   <head>
-    <script type="text/javascript" src="/js/options.js"></script>
     <style>
       input[type="text"] {
         width: 500px;
@@ -8,19 +7,7 @@
     </style>
   </head>
   <body>
-    <form>
-      <ul>
-        <li class="github-config">
-          <h3>Github Enterprise</h3>
-          <table>
-            <tr><td>origin   </td><td><input type="text" name="origin" /></td></tr>
-            <tr><td>api root </td><td><input type="text" name="api-root" disabled /></td></tr>
-            <tr><td>token    </td><td><input type="text" name="token" /></td></tr>
-          </table>
-          <button class="test-button" type="button">connection test</button>
-        </li>
-      </ul>
-      <button class="save-button" type="button">save</button>
-    </form>
+    <div id="app"></div>
+    <script type="text/javascript" src="/js/app.js"></script>
   </body>
 </html>

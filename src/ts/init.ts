@@ -5,4 +5,5 @@ if (localStorage.getItem('origins') === null) {
             apiRoot: 'https://api.github.com'
         }
     ]))
+    localStorage.setItem('mode', 'github')
 }
