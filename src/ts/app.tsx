@@ -1,16 +1,13 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { List, Map, is } from 'immutable';
+import { TokenStatus } from './token_status';
 
 interface Config {
   origin: string;
   apiRoot: string;
   token: string;
   status: TokenStatus;
-}
-
-enum TokenStatus {
-  unchecked, verified, failed
 }
 
 interface OptionProps {
@@ -136,7 +133,6 @@ class App extends React.PureComponent<OptionProps, OptionState> {
       {
         configs.map((config, index) => {
           return <section key={config.origin}>
-            <h3>{config.origin}</h3>
             <table>
               <tbody>
                 <tr>
