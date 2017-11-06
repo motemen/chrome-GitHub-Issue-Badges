@@ -164,8 +164,16 @@ function isConfig(config: any): config is Config {
   return config.origin !== undefined && config.apiRoot !== undefined && config.token !== undefined;
 }
 
+// fix for configurations created between 2.4.0 and 2.5.0
+function fixupConfig(config: any): any {
+  if (config.token === undefined) {
+    config.token = '';
+  }
+  return config;
+}
+
 const origins: any[] = JSON.parse(localStorage.getItem('origins') || '[]');
-const configs: Config[] = origins.filter(isConfig);
+const configs: Config[] = origins.map(fixupConfig).filter(isConfig);
 const github: boolean = localStorage.getItem('mode') === 'github';
 
 ReactDOM.render(
