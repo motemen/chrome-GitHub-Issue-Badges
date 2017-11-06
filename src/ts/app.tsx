@@ -1,16 +1,13 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { List, Map, is } from 'immutable';
+import { TokenStatus } from './token_status';
 
 interface Config {
   origin: string;
   apiRoot: string;
   token: string;
   status: TokenStatus;
-}
-
-enum TokenStatus {
-  unchecked, verified, failed
 }
 
 interface OptionProps {
@@ -136,7 +133,6 @@ class App extends React.PureComponent<OptionProps, OptionState> {
       {
         configs.map((config, index) => {
           return <section key={config.origin}>
-            <h3>{config.origin}</h3>
             <table>
               <tbody>
                 <tr>
@@ -168,8 +164,16 @@ function isConfig(config: any): config is Config {
   return config.origin !== undefined && config.apiRoot !== undefined && config.token !== undefined;
 }
 
+// fix for configurations created between 2.4.0 and 2.5.0
+function fixupConfig(config: any): any {
+  if (config.token === undefined) {
+    config.token = '';
+  }
+  return config;
+}
+
 const origins: any[] = JSON.parse(localStorage.getItem('origins') || '[]');
-const configs: Config[] = origins.filter(isConfig);
+const configs: Config[] = origins.map(fixupConfig).filter(isConfig);
 const github: boolean = localStorage.getItem('mode') === 'github';
 
 ReactDOM.render(
