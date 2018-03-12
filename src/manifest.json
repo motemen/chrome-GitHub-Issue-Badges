@@ -2,7 +2,8 @@
   "name": "GitHub Issue Badges",
   "version": "2.5.2",
   "manifest_version": 2,
-  "description": "",
+  "description": "Replace issue links to badges displaying issue status/title",
+  "icons": { "128": "icon128.png" },
   "permissions": [
     "tabs"
   ],

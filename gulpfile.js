@@ -39,7 +39,12 @@ const configure = {
   gulp.task(`html:${mode}`, function() {
     return gulp.src('src/html/*.html')
       .pipe(gulp.dest(`build/${mode}/html/`))
-  })
+  });
+
+  gulp.task(`image:${mode}`, function() {
+    return gulp.src('src/*.png')
+      .pipe(gulp.dest(`build/${mode}`))
+  });
 
   gulp.task(`bundle:${mode}`, ['compile'], function (done) {
     webpack({
@@ -64,7 +69,7 @@ const configure = {
     }, done);
   });
 
-  gulp.task(`build:${mode}`, [ 'bundle', 'manifest', 'html' ].map((name) => `${name}:${mode}`));
+  gulp.task(`build:${mode}`, [ 'bundle', 'manifest', 'html', 'image' ].map((name) => `${name}:${mode}`));
 
   gulp.task(`dist:${mode}`, [ `build:${mode}` ], function () {
     const version = require(`./build/${mode}/manifest.json`).version;
