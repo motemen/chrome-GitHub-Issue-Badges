@@ -39,7 +39,7 @@ export class BadgeView {
                    xlink:href="${user.avatar_url}"></image>
         `);
 
-        return `<svg class="embed-badge" width="${this.badgeWidth}" height="${this.badgeHeight}" style="border-radius: 2px; vertical-align: middle; margin-right: 0.3em">
+        return `<svg class="embed-badge" width="${this.badgeWidth}" height="${this.badgeHeight}" style="font-weight: normal;border-radius: 2px; vertical-align: middle; margin-right: 0.3em">
   <rect x="0" y="0" style="fill:#555"
         width="${this.numberWidth}" height="${this.badgeHeight}" />
   <rect x="${this.numberWidth}" y="0" style="fill:#${this.stateColor}"
