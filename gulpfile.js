@@ -20,7 +20,7 @@ const configure = {
 
 ["GITHUB", "GHE"].forEach(mode => {
 
-  gulp.task(`manifest:${mode}`, ['compile'], function () {
+  gulp.task(`manifest:${mode}`, function () {
     return gulp.src('src/manifest.json')
       .pipe($.jsonEditor(function (manifest) {
         manifest.name =
@@ -46,7 +46,7 @@ const configure = {
       .pipe(gulp.dest(`build/${mode}`))
   });
 
-  gulp.task(`bundle:${mode}`, ['compile'], function (done) {
+  gulp.task(`bundle:${mode}`, function (done) {
     webpack({
       entry: {
         app: './.tmp/js/app.js',
@@ -69,14 +69,15 @@ const configure = {
     }, done);
   });
 
-  gulp.task(`build:${mode}`, [ 'bundle', 'manifest', 'html', 'image' ].map((name) => `${name}:${mode}`));
+  gulp.task(`build:${mode}`, gulp.series([ 'bundle', 'manifest', 'html', 'image' ].map((name) => `${name}:${mode}`)));
 
-  gulp.task(`dist:${mode}`, [ `build:${mode}` ], function () {
-    const version = require(`./build/${mode}/manifest.json`).version;
-    gulp.src(`build/${mode}/**/*`)
-      .pipe($.zip(`${mode}-${version}.zip`))
-      .pipe(gulp.dest('dist'));
-  });
+  gulp.task(`dist:${mode}`, gulp.series([`build:${mode}`, function () {
+      const version = require(`./build/${mode}/manifest.json`).version;
+      gulp.src(`build/${mode}/**/*`)
+        .pipe($.zip(`${mode}-${version}.zip`))
+        .pipe(gulp.dest('dist'));
+    }])
+  );
 });
 
 var project = $.typescript.createProject('tsconfig.json');
@@ -89,13 +90,13 @@ gulp.task('compile', function () {
 });
 
 gulp.task('watch', function () {
-  gulp.watch(['src/ts/**/*.{ts,tsx}'], ['bundle:GITHUB', 'bundle:GHE']);
+  gulp.watch(['src/ts/**/*.{ts,tsx}'], ['compile', 'bundle:GITHUB', 'bundle:GHE']);
 });
 
-gulp.task('build', [ 'build:GITHUB', 'build:GHE' ]);
+gulp.task('build', gulp.series([ 'compile', 'build:GITHUB', 'build:GHE' ]));
 
-gulp.task('dist', [ 'dist:GITHUB', 'dist:GHE' ]);
+gulp.task('dist', gulp.series([ 'dist:GITHUB', 'dist:GHE' ]));
 
 gulp.task('clean', del.bind(null, ['build/', '.tmp/']));
 
-gulp.task('default', ['build']);
+gulp.task('default', gulp.series(['build']));
