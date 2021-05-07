@@ -73,7 +73,7 @@ const configure = {
 
   gulp.task(`dist:${mode}`, gulp.series([`build:${mode}`, function () {
       const version = require(`./build/${mode}/manifest.json`).version;
-      gulp.src(`build/${mode}/**/*`)
+      return gulp.src(`build/${mode}/**/*`)
         .pipe($.zip(`${mode}-${version}.zip`))
         .pipe(gulp.dest('dist'));
     }])
